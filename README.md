@@ -10,9 +10,9 @@ go-minimax requires Go version 1.18 or greater.
 ## Features
 - [x] Chatcompletion pro
 - [x] Chatcompletion
+- [x] Embeddings
 - [ ] T2A
 - [ ] T2A pro
-- [ ] Embeddings
 
 ## Usage
 
@@ -92,6 +92,33 @@ func main() {
 		}
 		fmt.Printf("%#v\n", resp)
 	}
+}
+
+```
+
+### Minimax CreateEmbeddings Example:
+
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+	
+	minimax "github.com/Twacqwq/go-minimax"
+)
+
+func main() {
+    client := minimax.NewClient("your token", "your group id")
+	resp, err := client.CreateEmbeddings(context.Background(), &minimax.CreateEmbeddingsRequest{
+		Texts: []string{"hello"},
+		// Type: minimax.EmbeddingsDbType,
+		Type:  minimax.EmbeddingsQueryType,
+	})
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("%#v\n", resp)
 }
 
 ```

@@ -13,15 +13,19 @@ var ()
 const (
 	Abab5     = "abab5-chat"
 	Abab5Dot5 = "abab5.5-chat"
+	Embo01    = "embo-01"
 
 	ModelBot            = "MM智能助理"
 	ChatMessageRoleUser = "USER"
 	ChatMessageRoleBot  = "BOT"
+	EmbeddingsDbType    = "db"
+	EmbeddingsQueryType = "query"
 )
 
 var supportModels = map[string]string{
 	Abab5:     "/text/chatcompletion",
 	Abab5Dot5: "/text/chatcompletion_pro",
+	Embo01:    "/embeddings",
 }
 
 func checkSupportModels(model string) bool {
@@ -40,6 +44,7 @@ type ChatCompletionRequest struct {
 	BotSetting        []BotSetting     `json:"bot_setting"`
 	SampleMessages    []Message        `json:"sample_messages,omitempty"`
 	Stream            bool             `json:"stream,omitempty"`
+	Prompt            string           `json:"prompt,omitempty"`
 	TokensToGenerate  int64            `json:"tokens_to_generate,omitempty"`
 	Temperature       float32          `json:"temperature,omitempty"`
 	TopP              float32          `json:"top_p,omitempty"`
@@ -59,6 +64,18 @@ type ChatCompletionResponse struct {
 	InputSensitive  bool                `json:"input_sensitive,omitempty"`
 	OutputSensitive bool                `json:"output_sensitive,omitempty"`
 	BaseResp        BaseResp            `json:"base_resp,omitempty"`
+}
+
+type CreateEmbeddingsRequest struct {
+	Model string `json:"model"`
+
+	Texts []string `json:"texts"`
+	Type  string   `json:"type"`
+}
+
+type CreateEmbeddingsResponse struct {
+	Vectors  [][]float32 `json:"vectors"`
+	BaseResp BaseResp    `json:"base_resp"`
 }
 
 type ChatCompletionStream struct {
