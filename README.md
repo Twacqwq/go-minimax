@@ -155,7 +155,17 @@ func main() {
 ### Minimax CreateTextToSpeechPro Example:
 
 ```go
-client := minimax.NewClient("your token", "your group id")
+package main
+
+import (
+	"context"
+	"fmt"
+
+	minimax "github.com/Twacqwq/go-minimax"
+)
+
+func main() {
+	client := minimax.NewClient("your token", "your group id")
 	resp, err := client.CreateTextToSpeechPro(context.Background(), &minimax.CreateT2ARequest{
 		Text:    "hello",
 		VoiceId: "female-yujie",
@@ -165,5 +175,6 @@ client := minimax.NewClient("your token", "your group id")
 	}
 
 	fmt.Printf("%#v\n", resp)
+}
 
 ```
