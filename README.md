@@ -1,4 +1,6 @@
 # Go Minimax
+[![Go Report Card](https://goreportcard.com/badge/github.com/Twacqwq/go-minimax)](https://goreportcard.com/report/github.com/Twacqwq/go-minimax)
+
 The [Minimax](https://api.minimax.chat) unofficial Go library.
 
 ## Installation
