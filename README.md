@@ -122,3 +122,48 @@ func main() {
 }
 
 ```
+
+### Minimax CreateTextToSpeech Example:
+
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+
+	minimax "github.com/Twacqwq/go-minimax"
+)
+
+func main() {
+	client := minimax.NewClient("your token", "your group id")
+	resp, err := client.CreateTextToSpeech(context.Background(), &minimax.CreateT2ARequest{
+		Text:    "hello",
+		VoiceId: "female-yujie",
+		Path:    "./",
+		Name:    "hello.mp3",
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Printf("%#v\n", resp)
+}
+
+```
+
+### Minimax CreateTextToSpeechPro Example:
+
+```go
+client := minimax.NewClient("your token", "your group id")
+	resp, err := client.CreateTextToSpeechPro(context.Background(), &minimax.CreateT2ARequest{
+		Text:    "hello",
+		VoiceId: "female-yujie",
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Printf("%#v\n", resp)
+
+```
