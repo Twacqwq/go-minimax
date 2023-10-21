@@ -41,8 +41,7 @@ func main() {
 		},
 	})
 	if err != nil {
-		t.Log(err)
-		return
+		panic(err)
 	}
 
 	fmt.Printf("%v\n", resp.Reply)
