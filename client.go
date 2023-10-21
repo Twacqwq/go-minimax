@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 
 	pkg "github.com/Twacqwq/go-minimax/internal"
 )
@@ -53,7 +54,7 @@ func (c *Client) buildFullURL(model string) string {
 	return fmt.Sprintf("%s%s?GroupId=%s", c.config.BaseURL, supportModels[model], c.config.groupId)
 }
 
-func (c *Client) send(req *http.Request, v any) error {
+func (c *Client) send(req *http.Request, v any, files ...*os.File) error {
 	contentType := req.Header.Get("Content-Type")
 	if contentType == "" {
 		req.Header.Set("Content-Type", "application/json")
@@ -67,6 +68,10 @@ func (c *Client) send(req *http.Request, v any) error {
 
 	if isFailureStatusCode(resp) {
 		return err
+	}
+
+	if resp.Header.Get("Content-Type") == "audio/mpeg" {
+		return decodeResponse(resp.Body, v, files...)
 	}
 
 	return decodeResponse(resp.Body, v)
@@ -91,7 +96,7 @@ func sendStream[T steamable](client *Client, req *http.Request) (*streamReader[T
 	}, nil
 }
 
-func decodeResponse(body io.Reader, v any) error {
+func decodeResponse(body io.Reader, v any, files ...*os.File) error {
 	if v == nil {
 		return nil
 	}
@@ -100,11 +105,25 @@ func decodeResponse(body io.Reader, v any) error {
 		return decodeString(body, res)
 	}
 
+	if len(files) > 0 {
+		return decodeFile(body, files[0])
+	}
+
 	return json.NewDecoder(body).Decode(v)
 }
 
 func isFailureStatusCode(resp *http.Response) bool {
 	return resp.StatusCode < http.StatusOK || resp.StatusCode >= http.StatusBadRequest
+}
+
+func decodeFile(body io.Reader, output *os.File) error {
+	b, err := io.ReadAll(body)
+	if err != nil {
+		return err
+	}
+
+	_, err = output.Write(b)
+	return err
 }
 
 func decodeString(body io.Reader, outout *string) error {

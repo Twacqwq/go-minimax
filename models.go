@@ -3,17 +3,20 @@ package minimax
 import "errors"
 
 var (
-	ErrCompletionUnsupportedModel   = errors.New("this model is not supported with this method, please use CreateChatCompletion client method instead") //nolint:lll
-	ErrCompletionStreamNotSupported = errors.New("streaming is not supported with this method, please use CreateCompletionStream")                      //nolint:lll
-	ErrTooManyEmptyStreamMessages   = errors.New("")
+	ErrCompletionUnsupportedModel        = errors.New("this model is not supported with this method, please use CreateChatCompletion client method instead") //nolint:lll
+	ErrCompletionStreamNotSupported      = errors.New("streaming is not supported with this method, please use CreateCompletionStream")                      //nolint:lll
+	ErrTooManyEmptyStreamMessages        = errors.New("too many empty messages")
+	ErrCreateTextToSpeechProNotSupported = errors.New("params is not supported, please use CreateTextToSpeechPro")
 )
 
 var ()
 
 const (
-	Abab5     = "abab5-chat"
-	Abab5Dot5 = "abab5.5-chat"
-	Embo01    = "embo-01"
+	Abab5       = "abab5-chat"
+	Abab5Dot5   = "abab5.5-chat"
+	Embo01      = "embo-01"
+	Speech01    = "speech-01"
+	Speech01Pro = "speech-01-pro" // alias speech-01=speech-01-pro
 
 	ModelBot            = "MM智能助理"
 	ChatMessageRoleUser = "USER"
@@ -23,9 +26,11 @@ const (
 )
 
 var supportModels = map[string]string{
-	Abab5:     "/text/chatcompletion",
-	Abab5Dot5: "/text/chatcompletion_pro",
-	Embo01:    "/embeddings",
+	Abab5:       "/text/chatcompletion",
+	Abab5Dot5:   "/text/chatcompletion_pro",
+	Embo01:      "/embeddings",
+	Speech01:    "/text_to_speech",
+	Speech01Pro: "/t2a_pro",
 }
 
 func checkSupportModels(model string) bool {
@@ -131,4 +136,17 @@ type Parameters struct {
 	Type       string   `json:"type"`
 	Required   []string `json:"required"`
 	Properties any      `json:"properties"`
+}
+
+type TimberWeight struct {
+	VoiceId string `json:"voice_id"`
+	Weight  int    `json:"weight"`
+}
+
+type ExtraInfo struct {
+	AudioLength     int64 `json:"audio_length,omitempty"`
+	AudioSampleRate int64 `json:"audio_sample_rate,omitempty"`
+	AudioSize       int64 `json:"audio_size,omitempty"`
+	Bitrate         int64 `json:"bitrate,omitempty"`
+	WordCount       int64 `json:"word_count,omitempty"`
 }

@@ -11,8 +11,8 @@ go-minimax requires Go version 1.18 or greater.
 - [x] Chatcompletion pro
 - [x] Chatcompletion
 - [x] Embeddings
-- [ ] T2A
-- [ ] T2A pro
+- [x] T2A
+- [x] T2A pro
 
 ## Usage
 
