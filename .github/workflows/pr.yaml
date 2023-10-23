@@ -1,8 +1,10 @@
 name: Sanity check
 
 on:
-  - push
-  - pull_request
+  push:
+    branches: [ "*" ]
+  pull_request:
+    branches: [ "*" ]
 
 jobs:
   prcheck:
