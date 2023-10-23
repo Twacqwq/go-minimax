@@ -1,14 +1,28 @@
 name: Sanity check
 
 on:
-  - push
-  - pull_request
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "*" ]
 
 jobs:
   prcheck:
     name: Sanity check
     runs-on: ubuntu-latest
     steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.20.0'
+
+    - name: Test
+      run: go test -v ./...
+    
+    - name: Run coverage
+      run: go test -race -coverprofile=coverage.txt -covermode=atomic
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v3
       env:
