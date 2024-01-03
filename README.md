@@ -16,6 +16,15 @@ go-minimax requires Go version 1.18 or greater.
 - [x] Embeddings
 - [x] T2A
 - [x] T2A pro
+- [ ] T2A large
+- [ ] T2A Stream
+- [ ] Voice Cloning
+- [ ] Assistants API
+- [ ] Files
+- [ ] Retrieval
+- [ ] Finetune API
+- [ ] Role Classification
+- [ ] Role Audio Generation
 
 ## Usage
 
