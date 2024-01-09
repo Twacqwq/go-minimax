@@ -1,8 +1,8 @@
-# Go Minimax
+# Go MiniMax
 [![Go Reference](https://pkg.go.dev/badge/github.com/Twacqwq/go-minimax.svg)](https://pkg.go.dev/github.com/Twacqwq/go-minimax)
 [![Go Report Card](https://goreportcard.com/badge/github.com/Twacqwq/go-minimax)](https://goreportcard.com/report/github.com/Twacqwq/go-minimax)
 
-The [Minimax](https://api.minimax.chat) unofficial Go library.
+The [MiniMax](https://api.minimax.chat) unofficial Go library.
 
 ## Installation
 ```bash
