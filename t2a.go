@@ -44,7 +44,7 @@ func (c *Client) CreateTextToSpeech(ctx context.Context, request *CreateT2AReque
 	}
 	defer outputFile.Close()
 
-	req, err := c.newRequest(ctx, c.buildFullURL(request.Model), http.MethodPost, withBody(request))
+	req, err := c.newRequest(ctx, c.buildFullURL(speech, request.Model), http.MethodPost, withBody(request))
 	if err != nil {
 		return nil, err
 	}
@@ -59,7 +59,7 @@ func (c *Client) CreateTextToSpeech(ctx context.Context, request *CreateT2AReque
 
 func (c *Client) CreateTextToSpeechPro(ctx context.Context, request *CreateT2ARequest) (*CreateT2AResponse, error) {
 	request.Model = Speech01
-	req, err := c.newRequest(ctx, c.buildFullURL(Speech01Pro), http.MethodPost, withBody(request))
+	req, err := c.newRequest(ctx, c.buildFullURL(speechPro, Speech01Pro), http.MethodPost, withBody(request))
 	if err != nil {
 		return nil, err
 	}

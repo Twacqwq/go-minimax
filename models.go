@@ -9,11 +9,19 @@ var (
 	ErrCreateTextToSpeechProNotSupported = errors.New("params is not supported, please use CreateTextToSpeechPro")
 )
 
-var ()
+var (
+	completion    = "/text/chatcompletion"
+	completionPro = "/text/chatcompletion_pro"
+	embedding     = "/embeddings"
+	speech        = "/text_to_speech"
+	speechPro     = "/t2a_pro"
+)
 
 const (
 	Abab5       = "abab5-chat"
 	Abab5Dot5   = "abab5.5-chat"
+	Abab5Dot5s  = "abab5.5s-chat"
+	Abab6       = "abab6-chat"
 	Embo01      = "embo-01"
 	Speech01    = "speech-01"
 	Speech01Pro = "speech-01-pro" // alias speech-01=speech-01-pro
@@ -25,17 +33,35 @@ const (
 	EmbeddingsQueryType = "query"
 )
 
-var supportModels = map[string]string{
-	Abab5:       "/text/chatcompletion",
-	Abab5Dot5:   "/text/chatcompletion_pro",
-	Embo01:      "/embeddings",
-	Speech01:    "/text_to_speech",
-	Speech01Pro: "/t2a_pro",
+// interface -> model:status
+var supportModels = map[string]map[string]bool{
+	completion: {
+		Abab5:      false,
+		Abab5Dot5:  true,
+		Abab5Dot5s: true,
+		Abab6:      false,
+	},
+	completionPro: {
+		Abab5:      false,
+		Abab5Dot5:  true,
+		Abab5Dot5s: true,
+		Abab6:      true,
+	},
+	embedding: {Embo01: true},
+	speech:    {Speech01: true},
+	speechPro: {Speech01Pro: true},
 }
 
-func checkSupportModels(model string) bool {
-	_, ok := supportModels[model]
-	return ok
+func checkSupportModels(version, model string) bool {
+	return supportModels[version][model]
+}
+
+func getURL(version, module string) string {
+	if supportModels[version][module] {
+		return version
+	}
+
+	return ""
 }
 
 type Usage struct {
@@ -44,12 +70,26 @@ type Usage struct {
 }
 
 type ChatCompletionRequest struct {
+	Model               string    `json:"model"`
+	Messages            []Message `json:"messages"`
+	Stream              bool      `json:"stream,omitempty"`
+	Prompt              string    `json:"prompt"`
+	TokensToGenerate    int64     `json:"tokens_to_generate,omitempty"`
+	Temperature         float32   `json:"temperature,omitempty"`
+	TopP                float32   `json:"top_p,omitempty"`
+	UseStandardSSE      bool      `json:"use_standard_sse,omitempty"`
+	BeamWidth           int       `json:"beam_width,omitempty"`
+	RoleMeta            *RoleMeta `json:"role_meta"`
+	ContinueLastMessage bool      `json:"continue_last_message"`
+	SkipInfoMask        bool      `json:"skip_info_mask"`
+}
+
+type ChatCompletionProRequest struct {
 	Model             string           `json:"model"`
-	Messages          []Message        `json:"messages"`
+	Messages          []ProMessage     `json:"messages"`
 	BotSetting        []BotSetting     `json:"bot_setting"`
 	SampleMessages    []Message        `json:"sample_messages,omitempty"`
 	Stream            bool             `json:"stream,omitempty"`
-	Prompt            string           `json:"prompt,omitempty"`
 	TokensToGenerate  int64            `json:"tokens_to_generate,omitempty"`
 	Temperature       float32          `json:"temperature,omitempty"`
 	TopP              float32          `json:"top_p,omitempty"`
@@ -61,14 +101,31 @@ type ChatCompletionRequest struct {
 }
 
 type ChatCompletionResponse struct {
-	ID              string              `json:"id"`
-	Model           string              `json:"model"`
-	Reply           string              `json:"reply"`
-	Choices         []ChatMessageChoice `json:"choices"`
-	Usage           Usage               `json:"usage"`
-	InputSensitive  bool                `json:"input_sensitive,omitempty"`
-	OutputSensitive bool                `json:"output_sensitive,omitempty"`
-	BaseResp        BaseResp            `json:"base_resp,omitempty"`
+	ID                  string              `json:"id"`
+	Created             int64               `json:"created"`
+	Model               string              `json:"model"`
+	Reply               string              `json:"reply"`
+	Choices             []ChatMessageChoice `json:"choices"`
+	Usage               Usage               `json:"usage"`
+	InputSensitive      bool                `json:"input_sensitive,omitempty"`
+	InputSensitiveType  int64               `json:"input_sensitive_type,omitempty"`
+	OutputSensitive     bool                `json:"output_sensitive,omitempty"`
+	OutputSensitiveType int64               `json:"output_sensitive_type"`
+	BaseResp            BaseResp            `json:"base_resp,omitempty"`
+}
+
+type ChatCompletionProResponse struct {
+	ID                  string                 `json:"id"`
+	Created             int64                  `json:"created"`
+	Model               string                 `json:"model"`
+	Reply               string                 `json:"reply"`
+	Choices             []ChatMessageProChoice `json:"choices"`
+	Usage               Usage                  `json:"usage"`
+	InputSensitive      bool                   `json:"input_sensitive,omitempty"`
+	InputSensitiveType  int64                  `json:"input_sensitive_type,omitempty"`
+	OutputSensitive     bool                   `json:"output_sensitive,omitempty"`
+	OutputSensitiveType int64                  `json:"output_sensitive_type"`
+	BaseResp            BaseResp               `json:"base_resp,omitempty"`
 }
 
 type CreateEmbeddingsRequest struct {
@@ -87,12 +144,29 @@ type ChatCompletionStream struct {
 	*streamReader[ChatCompletionResponse]
 }
 
+type ChatCompletionProStream struct {
+	*streamReader[ChatCompletionProResponse]
+}
+
 type ChatMessageChoice struct {
-	FinishReason string    `json:"finish_reason,omitempty"`
-	Messages     []Message `json:"messages"`
+	Text         string `json:"text"`
+	Index        int64  `json:"index"`
+	FinishReason string `json:"finish_reason,omitempty"`
+	Delta        string `json:"delta"`
+}
+
+type ChatMessageProChoice struct {
+	FinishReason string       `json:"finish_reason,omitempty"`
+	Index        int64        `json:"index"`
+	Messages     []ProMessage `json:"messages"`
 }
 
 type Message struct {
+	SenderType string `json:"sender_type"`
+	Text       string `json:"text"`
+}
+
+type ProMessage struct {
 	SenderType string `json:"sender_type"`
 	SenderName string `json:"sender_name"`
 	Text       string `json:"text"`
@@ -149,4 +223,9 @@ type ExtraInfo struct {
 	AudioSize       int64 `json:"audio_size,omitempty"`
 	Bitrate         int64 `json:"bitrate,omitempty"`
 	WordCount       int64 `json:"word_count,omitempty"`
+}
+
+type RoleMeta struct {
+	UserName string `json:"user_name"`
+	BotName  string `json:"bot_name"`
 }

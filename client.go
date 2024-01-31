@@ -50,8 +50,8 @@ func (c *Client) setCommonHeader(req *http.Request) {
 	req.Header.Set("Content-Type", "application/json")
 }
 
-func (c *Client) buildFullURL(model string) string {
-	return fmt.Sprintf("%s%s?GroupId=%s", c.config.BaseURL, supportModels[model], c.config.groupId)
+func (c *Client) buildFullURL(version, model string) string {
+	return fmt.Sprintf("%s%s?GroupId=%s", c.config.BaseURL, getURL(version, model), c.config.groupId)
 }
 
 func (c *Client) send(req *http.Request, v any, files ...*os.File) error {

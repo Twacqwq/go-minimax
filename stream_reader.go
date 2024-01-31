@@ -15,7 +15,7 @@ var (
 )
 
 type steamable interface {
-	ChatCompletionResponse
+	ChatCompletionResponse | ChatCompletionProResponse
 }
 
 type streamReader[T steamable] struct {
