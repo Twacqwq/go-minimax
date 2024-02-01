@@ -13,8 +13,9 @@ import (
 )
 
 type Client struct {
-	config         *Config
-	requestBuilder *pkg.HTTPReqeustBuilder
+	config          *Config
+	requestBuilder  *pkg.HTTPReqeustBuilder
+	formDataBuilder pkg.CreateFormDataBuilderFunc
 }
 
 func NewClient(apiToken, groupId string) *Client {
@@ -25,6 +26,9 @@ func NewClientWithConfig(config *Config) *Client {
 	return &Client{
 		config:         config,
 		requestBuilder: pkg.NewHTTPRequestBuilder(),
+		formDataBuilder: func(w io.Writer) pkg.FormDataBuilder {
+			return pkg.NewDefaultFormDataBuilder(w)
+		},
 	}
 }
 
@@ -47,11 +51,14 @@ func (c *Client) newRequest(ctx context.Context, url, method string, opts ...opt
 
 func (c *Client) setCommonHeader(req *http.Request) {
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", c.config.apiToken))
-	req.Header.Set("Content-Type", "application/json")
 }
 
 func (c *Client) buildFullURL(version, model string) string {
 	return fmt.Sprintf("%s%s?GroupId=%s", c.config.BaseURL, getURL(version, model), c.config.groupId)
+}
+
+func (c *Client) fullURL(url string) string {
+	return fmt.Sprintf("%s%s?GroupId=%s", c.config.BaseURL, url, c.config.groupId)
 }
 
 func (c *Client) send(req *http.Request, v any, files ...*os.File) error {
@@ -101,12 +108,12 @@ func decodeResponse(body io.Reader, v any, files ...*os.File) error {
 		return nil
 	}
 
-	if res, ok := v.(*string); ok {
-		return decodeString(body, res)
-	}
-
 	if len(files) > 0 {
 		return decodeFile(body, files[0])
+	}
+
+	if res, ok := v.(*string); ok {
+		return decodeString(body, res)
 	}
 
 	return json.NewDecoder(body).Decode(v)
@@ -148,8 +155,8 @@ func withBody(body any) option {
 	}
 }
 
-// func withContentType(contentType string) option {
-// 	return func(opt *requestOptions) {
-// 		opt.header.Set("Content-Type", contentType)
-// 	}
-// }
+func withContentType(contentType string) option {
+	return func(opt *requestOptions) {
+		opt.header.Set("Content-Type", contentType)
+	}
+}
