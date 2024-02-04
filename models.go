@@ -31,6 +31,11 @@ const (
 	ChatMessageRoleBot  = "BOT"
 	EmbeddingsDbType    = "db"
 	EmbeddingsQueryType = "query"
+
+	ToolCodeInterpreter = "code_interpreter"
+	ToolRetrieval       = "retrieval"
+	ToolFunction        = "function"
+	ToolWebSearch       = "web_search"
 )
 
 // interface -> model:status
@@ -228,4 +233,9 @@ type ExtraInfo struct {
 type RoleMeta struct {
 	UserName string `json:"user_name"`
 	BotName  string `json:"bot_name"`
+}
+
+type Tool struct {
+	Typ      string `json:"type,omitempty"`
+	Function string `json:"function,omitempty"`
 }

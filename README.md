@@ -19,8 +19,11 @@ go-minimax requires Go version 1.18 or greater.
 - [ ] T2A large
 - [ ] T2A Stream
 - [ ] Voice Cloning
-- [ ] Assistants API
-- [ ] Files
+- [x] Assistants API
+- [ ] Thread
+- [ ] Run
+- [ ] Message
+- [x] Files
 - [ ] Retrieval
 - [ ] Finetune API
 - [ ] Role Classification

@@ -16,6 +16,7 @@ type Client struct {
 	config          *Config
 	requestBuilder  *pkg.HTTPReqeustBuilder
 	formDataBuilder pkg.CreateFormDataBuilderFunc
+	queryBuilder    pkg.QueryBuilder
 }
 
 func NewClient(apiToken, groupId string) *Client {
@@ -29,6 +30,7 @@ func NewClientWithConfig(config *Config) *Client {
 		formDataBuilder: func(w io.Writer) pkg.FormDataBuilder {
 			return pkg.NewDefaultFormDataBuilder(w)
 		},
+		queryBuilder: pkg.NewURLQueryBuilder(),
 	}
 }
 
